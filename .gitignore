@@ -1,1 +1,3 @@
-cogs/_pycache_/*
+cogs/_pycache_/*.pyc
+cogs/__pycache__/
+.env
