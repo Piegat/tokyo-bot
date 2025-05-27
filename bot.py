@@ -3,6 +3,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import os
 import asyncio
+from discord.ext import commands
 
 load_dotenv()
 
@@ -21,8 +22,8 @@ initial_extensions = [
     'cogs.punicoes',
     'cogs.sistema',
     'cogs.liders',
+    'cogs.escalacao'
 ]
-from discord.ext import commands
 
 @bot.event
 async def on_command_error(ctx, error):
