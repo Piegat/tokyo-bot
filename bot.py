@@ -19,7 +19,8 @@ async def on_ready():
 initial_extensions = [
     'cogs.metas',
     'cogs.punicoes',
-    'cogs.sistema'
+    'cogs.sistema',
+    'cogs.liders',
 ]
 from discord.ext import commands
 

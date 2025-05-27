@@ -1,7 +1,13 @@
 from discord.ext import commands
 import discord
-import os
+from utils.metas_utils import atualizar_lista_metas_atrasadas
 
+import os
+META_PAGA = os.getenv('CARGO_META_PAGA')
+ROLE_META_PENDENTE = os.getenv('CARGO_META_PENDENTE')
+ROLE_META_ATRASADA = os.getenv('CARGO_META_ATRASADA')
+CANAL_METAS_ATRASADAS = os.getenv('CANAL_METAS_ATRASADAS')
+            
 class Metas(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -27,23 +33,27 @@ class Metas(commands.Cog):
 
     @commands.command(name='listar')
     async def listar(self, ctx):
-        g = ctx.guild
-        membros_paga = [m.mention for m in g.get_role(self.cargo_meta_paga).members]
-        membros_pendente = [m.mention for m in g.get_role(self.cargo_meta_pendente).members]
-        membros_atrasada = [m.mention for m in g.get_role(self.cargo_meta_atrasada).members]
+        role_paga = ctx.guild.get_role(self.cargo_meta_paga)
+        role_pendente = ctx.guild.get_role(self.cargo_meta_pendente)
+        role_atrasada = ctx.guild.get_role(self.canal_metas_atrasadas)
 
-        await ctx.send(
-            f"**Meta Paga:** {', '.join(membros_paga) or 'Nenhum'}\n"
-            f"**Meta Pendente:** {', '.join(membros_pendente) or 'Nenhum'}\n"
-            f"**Meta Atrasada:** {', '.join(membros_atrasada) or 'Nenhum'}"
-        )
+        membros_pagos = [m.mention for m in ctx.guild.members if role_paga in m.roles]
+        membros_pendentes = [m.mention for m in ctx.guild.members if role_pendente in m.roles]
+        membros_atrasados = [m.mention for m in ctx.guild.members if role_atrasada in m.roles]
+
+        embed = discord.Embed(title="Status das Metas Semanais", color=discord.Color.blue())
+        embed.add_field(name="Meta Paga", value="\n".join(membros_pagos) if membros_pagos else "Nenhum", inline=False)
+        embed.add_field(name="Meta Pendente", value="\n".join(membros_pendentes) if membros_pendentes else "Nenhum", inline=False)
+        embed.add_field(name="Meta Atrasada", value="\n".join(membros_atrasados) if membros_atrasados else "Nenhum", inline=False)
+
+        await ctx.send(embed=embed)
+
 
     @commands.command(name='relatorio')
     async def relatorio(self, ctx):
-        canal = ctx.guild.get_channel(self.canal_metas_atrasadas)
-        membros_atrasada = [m.mention for m in ctx.guild.get_role(self.cargo_meta_atrasada).members]
-        await canal.send(f"**Usuários com meta atrasada:** {', '.join(membros_atrasada) or 'Nenhum'}")
-        await ctx.send("Relatório enviado.")
+        await atualizar_lista_metas_atrasadas(ctx.guild, self.canal_metas_atrasadas, self.cargo_meta_atrasada)
+        await ctx.send("Relatório atualizado no canal de metas.")
+    
 
 async def setup(bot):
     await bot.add_cog(Metas(bot))
