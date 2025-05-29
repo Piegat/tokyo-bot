@@ -35,7 +35,7 @@ class Metas(commands.Cog):
     async def listar(self, ctx):
         role_paga = ctx.guild.get_role(self.cargo_meta_paga)
         role_pendente = ctx.guild.get_role(self.cargo_meta_pendente)
-        role_atrasada = ctx.guild.get_role(self.canal_metas_atrasadas)
+        role_atrasada = ctx.guild.get_role(self.cargo_meta_atrasada)
 
         membros_pagos = [m.mention for m in ctx.guild.members if role_paga in m.roles]
         membros_pendentes = [m.mention for m in ctx.guild.members if role_pendente in m.roles]
